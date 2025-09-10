@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}">
+  <meta charset="UTF-8"/>
+  <title>강의 등록</title>
+</head>
+<body>
+  <header th:replace="~{layout :: header}"></header>
+  <div class="layout">
+    <main class="content">
+      <h1>새 강의 등록</h1>
+
+      <form th:action="@{/lecture/new}" th:object="${lecture}" method="post">
+        <label>담당 강사:
+          <span th:text="${currentUser.username}">강사명</span>
+        </label>
+        <input type="hidden"
+               th:field="*{instructorNo}"
+               th:value="${currentUser.id}" />
+
+        <br/>
+        <label>제목:
+          <input th:field="*{title}" required/>
+        </label>
+        <br/>
+        <label>설명:
+          <textarea th:field="*{lectureDesc}"></textarea>
+        </label>
+        <br/>
+        <label>공개 여부:
+          <select th:field="*{visibility}">
+            <option value="1">전체 공개</option>
+            <option value="0">비공개</option>
+          </select>
+        </label>
+        <br/>
+        <button type="submit">등록</button>
+      </form>
+
+      <p><a th:href="@{/lecture}">등록된 강의 목록</a></p>
+    </main>
+  </div>
+</body>
+</html>

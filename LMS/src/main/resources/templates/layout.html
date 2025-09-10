@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+  <!-- head fragment 정의만, replace 절대 쓰지 않음 -->
+  <head th:fragment="head"> 
+    <meta charset="UTF-8">
+    <title>LMS+</title>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/not_lame.css}" />
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  </head>
+ 
+  <body>
+    <div th:fragment="header">
+      <div id="navbar-wrapper">
+        <header>
+          <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" th:href="@{/}">LMS+</a>
+              </div>
+              <div id="navbar-collapse" class="collapse navbar-collapse">          
+                <form class="navbar-form navbar-left search-form" action="/lectures/search" method="get" role="search">
+                  <div class="input-group">
+                    <input class="form-control" type="text" name="keyword" placeholder="검색어를 입력하세요"
+                           th:value="${keyword}" required />
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="submit">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                      </button>
+                    </span>
+                  </div>       
+                </form>  
+                <ul class="nav navbar-nav navbar-right">
+                  <li class="dropdown">
+                    <div th:if="${username == null}" id="navbar-login"> 
+                      <div id="font-container">
+                        <a th:href="@{/login}" class="fonts">로그인</a>
+                        <a th:href="@{/register}" class="fonts">회원가입</a>
+                      </div>     
+                    </div>
+                    <a th:if="${username != null}" id="user-profile" href="#" class="dropdown-toggle" data-toggle="dropdown">
+                      <img class="img-responsive img-thumbnail img-circle">
+                      <strong th:text="${username}"></strong>
+                    </a>
+                    <ul th:if="${username != null}" class="dropdown-menu dropdown-block" role="menu">
+                      <li><a th:href="@{/mypage}">마이페이지</a></li>
+                      <li><a th:href="@{/logout}">로그아웃</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+        </header>
+      </div>
+
+      <div id="wrapper">
+        <div id="sidebar-wrapper">
+          <aside id="sidebar">
+            <ul id="sidemenu" class="sidebar-nav">
+              <li>
+                 <a th:href="@{/lectures/recent}">
+                     <span class="sidebar-icon"><i class="bi bi-clock-history"></i></span>
+                        <span class="sidebar-title">최근 본 영상</span>
+                          </a>
+                      </li>
+                       <li>
+                          <a th:href="@{/lectures/favorites}">
+                              <span class="sidebar-icon"><i class="bi bi-star"></i></span>
+                              <span class="sidebar-title">즐겨찾기</span>
+                          </a>
+               </li>
+              <!-- 학생(authorization == 1) 메뉴 -->
+              <li th:if="${authorization == 1}">        
+                <a th:href="@{/user/messages}">
+                  <span class="sidebar-icon"><i class="bi bi-envelope"></i></span>
+                  <span class="sidebar-title">메세지 센터</span>
+                </a>
+              </li>     
+              <li th:if="${authorization == 1}">        
+                <a th:href="@{/lectures/list}">
+                  <span class="sidebar-icon"><i class="bi bi-mortarboard-fill"></i></span>
+                  <span class="sidebar-title">강의 리스트 보기</span>
+                </a>
+              </li>
+				<!-- 비공개 강의 신청 메뉴 추가 -->
+              <li th:if="${authorization == 1}">
+                <a th:href="@{/lectures/apply}">
+                  <span class="sidebar-icon"><i class="bi bi-lock-fill"></i></span>
+                  <span class="sidebar-title">비공개 강의 신청</span>
+                </a>
+              </li>
+              <!-- 강사(authorization == 2) 메뉴 -->
+              <li th:if="${authorization == 2}">
+                <a th:href="@{/user/messages}">
+                  <span class="sidebar-icon"><i class="bi bi-envelope"></i></span>
+                  <span class="sidebar-title">메세지 센터</span>
+                </a>       
+              </li>
+              <li th:if="${authorization == 2}">
+                <a th:href="@{/lecture/new}">
+                  <span class="sidebar-icon"><i class="bi bi-journal-plus"></i></span>
+                  <span class="sidebar-title">강의 등록</span>
+                </a>
+              </li>
+              <li th:if="${authorization == 2}">
+                <a th:href="@{/lecture/upload}">
+                  <span class="sidebar-icon"><i class="bi bi-upload"></i></span>
+                  <span class="sidebar-title">강의 영상 업로드</span>
+                </a>
+              </li>
+			<li th:if="${authorization == 2}">
+			  <a th:href="@{/instructor/students}">
+			    <span class="sidebar-icon"><i class="bi bi-people-fill"></i></span>
+			    <span class="sidebar-title">내 수강생</span>
+			  </a>
+			</li>
+              <li th:if="${authorization == 2}">
+                <a th:href="@{/instructor/lectures/manage}">
+                  <span class="sidebar-icon"><i class="bi bi-gear-fill"></i></span>
+                  <span class="sidebar-title">내 강의 수정</span>
+                </a>
+              </li>
+
+              <!-- 관리자(authorization == 0) 메뉴 -->
+              <li th:if="${authorization == 0}">
+                <a th:href="@{/user/messages}">
+                  <span class="sidebar-icon"><i class="bi bi-gear-fill"></i></span>
+                  <span class="sidebar-title">메세지 센터</span>
+                </a>
+              </li>
+              <li th:if="${authorization == 0}">        
+                <a th:href="@{/lectures/list}">
+                  <span class="sidebar-icon"><i class="bi bi-mortarboard-fill"></i></span>
+                  <span class="sidebar-title">강의 리스트 보기</span>
+                </a>
+              </li>
+              <li th:if="${authorization == 0}">
+                <a th:href="@{/admin/users}">
+                  <span class="sidebar-icon"><i class="bi bi-person-fill-gear"></i></span>
+                  <span class="sidebar-title">회원 관리</span>
+                </a>
+              </li>
+              <!-- <li th:if="${authorization == 0}">
+                <a th:href="@{/admin/tables}">
+                  <span class="sidebar-icon"><i class="bi bi-database-fill-gear"></i></span>
+                  <span class="sidebar-title">테이블 관리</span>
+                </a>
+              </li> -->
+
+            </ul>
+          </aside>            
+        </div>
+      </div> 
+    </div>  
+  </body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:replace = "~{layout :: head}"></th:block>
+<meta charset="UTF-8">
+<title>로그인</title>
+<link rel="stylesheet" th:href="@{/css/loginForm.css}"/>
+
+</head>
+<body>
+
+<!--  
+  <h1>로그인</h1>
+  <form th:action="@{/login}" method="post">
+    <label>아이디: <input type="text" name="username" required/></label><br/>
+    <label>비밀번호: <input type="password" name="password" required/></label><br/>
+    <button type="submit">로그인</button>
+  </form>
+  <p>아직 회원이 아니신가요? <a th:href="@{/register}">회원가입</a></p>
+  <div th:if="${param.error}"><p style="color:red;">로그인 실패</p></div>
+  <div th:if="${param.logout}"><p style="color:green;">로그아웃 되었습니다</p></div>
+  <div th:if="${message}" style="color:red;">
+	<p th:text="${message}"></p>
+  </div>
+  -->
+  <header th:replace="~{layout :: header}"></header>
+  <div class="layout">
+    <main class="content">
+  <h1 class="well">LMS+ 로그인</h1>
+			<div class="col-lg-12 well">
+			    <div class="row">
+						<form th:action="@{/login}" method="post">
+							<div class="col-sm-12">
+									
+							<div class="form-group">
+								
+								<label>아이디</label>
+								<input type="text" placeholder = "아이디 입력" name="username" class="form-control" required>
+									
+							</div>				
+							<div class="form-group">
+								<label>비밀번호</label>
+								<input type="password" placeholder="비밀번호 입력" name="password" class="form-control" required>
+							</div>					
+							
+							<button type="submit" class="btn btn-lg btn-info">로그인</button>					
+							
+							</div>
+							<div class="form-group" th:if="${message}" style="color:red;">
+							<p th:text="${message}"></p>
+  							</div>
+  							<div class="form-group" th:if="${param.error}"><p style="color:red;">로그인 실패</p></div>
+							<div class="form-group" th:if="${param.logout}"><p style="color:green;">로그아웃 되었습니다</p></div>
+							<div class="form-group" th:if="${message}" style="color:red;">
+								<p th:text="${message}"></p>
+							</div>
+						</form> 
+				  </div>
+				</div>
+  <p><a th:href="@{/}">메인으로</a></p> <p>아직 회원이 아니신가요? <a th:href="@{/register}">회원가입</a></p>
+ 
+  </main>
+  </div>
+</body>
+</html>

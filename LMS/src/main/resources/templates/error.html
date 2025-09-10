@@ -1,0 +1,29 @@
+<!-- src/main/resources/templates/error.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="'오류 발생: ' + ${error}">오류 발생</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    .container { background: white; padding: 20px; border-radius: 4px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    pre { background: #eee; padding: 10px; overflow-x: auto; }
+    h1 { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 th:text="${error}">죄송합니다.</h1>
+    <p>
+      상태 코드: <strong th:text="${status}">500</strong><br/>
+      메시지: <span th:text="${message}">요청하신 페이지를 처리하는 중에 문제가 발생했습니다.</span>
+    </p>
+    <h2>예외 상세 정보</h2>
+    <p><strong>Exception:</strong> <span th:text="${exception}">예외 클래스</span></p>
+    <h3>Stack Trace</h3>
+    <pre th:if="${trace}" th:text="${trace}">스택 트레이스 정보</pre>
+    <p><a th:href="@{/}">홈으로 돌아가기</a></p>
+  </div>
+</body>
+</html>

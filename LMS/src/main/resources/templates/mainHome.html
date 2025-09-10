@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{layout :: head}"></th:block>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js"></script>
+  <script th:src="@{./js/typing.js}"></script>
+  <link rel="stylesheet" th:href="@{./css/calendar.css}" type="text/css">
+  <link rel="stylesheet" th:href="@{./css/main_tabs.css}" type="text/css">
+  <style>
+    .fc-day-today    { background:#fffae6; }
+    .event-completed { text-decoration:line-through; }
+    .event-missed    { color:red; }
+    #calendar        { width:700px; margin:20px auto; }
+    .fc-day-green    { background:#e6ffea !important; }
+
+    .lecture-list    { list-style:none; padding:0; }
+    .lecture-item    { margin-bottom:10px; }
+    .lecture-item>div{ display:flex; align-items:center; gap:.5rem; }
+    .progress-info   { font-size:.85em; color:#555; }
+    .video-sublist   { list-style:disc; margin-left:20px; padding:0; }
+    .chapter-item    { display:flex; align-items:center; gap:.4rem; margin-top:4px; }
+    .chapter-progress{ font-size:.8em; color:#666; }
+  </style>
+</head>
+
+<body>
+<header th:replace="~{layout :: header}"></header>
+<div class="layout">
+  <main class="content">
+    <h1 id="welcome">
+      <a href="" class="typewrite" data-period="2000"
+         data-type='[ "LMS+에 오신 것을 환영합니다.",
+                      "캘린더로 강의 진도율을 확인하세요.",
+                      "공개된 강의를 둘러보세요.",
+                      "강의 영상에서 원하는 부분을 찾아보세요." ]'>
+        <span class="wrap"></span>
+      </a>
+    </h1>
+
+    <!-- 캘린더 -->
+    <div id="calendar" th:attr="data-events=${eventsJson}"></div>
+
+    <div class="tab_container">
+      <input id="tab1" type="radio" name="tabs" checked>
+      <label for="tab1"><i class="fa fa-list"></i><span>공개 강의</span></label>
+
+      <input id="tab2" type="radio" name="tabs">
+      <label for="tab2"><i class="bi bi-lock"></i><span>비공개 강의</span></label>
+
+      <!-- ───────────── 공개 강의 ───────────── -->
+      <section id="content1" class="tab-content">
+        <h3>공개 강의 리스트</h3><hr>
+        <ul class="lecture-list">
+          <li class="lecture-item" th:each="lec : ${publicLectures}">
+            <div>
+              <strong th:text="${lec.title}"></strong>
+
+              <!-- 강의 평균 진도율 -->
+              <span class="progress-info"
+                    th:text="'진도: ' + ${lectureProgressMap[lec.lectureNo]} + '%'">진도: 0%</span>
+
+              <!-- 캘린더 버튼 -->
+              <form th:action="@{/calendar/add}" method="post"
+                    th:if="${!scheduledLectures.contains(lec.lectureNo)}">
+                <input type="hidden" name="lectureNo" th:value="${lec.lectureNo}">
+                <button type="submit">캘린더에 추가</button>
+              </form>
+              <form th:action="@{/calendar/removeLecture}" method="post"
+                    th:if="${scheduledLectures.contains(lec.lectureNo)}">
+                <input type="hidden" name="lectureNo" th:value="${lec.lectureNo}">
+                <button type="submit">캘린더에서 제거</button>
+              </form>
+            </div>
+
+            <!-- 챕터 목록 -->
+            <ul class="video-sublist" th:each="vid : ${videosByLecture[lec.lectureNo]}">
+              <li class="chapter-item">
+                <a th:href="@{'/lecture/watch/' + ${vid.videoNo}}"
+                   th:text="${vid.videoPath}">챕터</a>
+                <span class="chapter-progress"
+                      th:text="'진도: ' + ${videoProgressMap[vid.videoNo]} + '%'">진도: 0%</span>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ───────────── 비공개 강의 ───────────── -->
+      <section id="content2" class="tab-content">
+        <h3>비공개 강의 리스트</h3><hr>
+        <ul class="lecture-list">
+          <li class="lecture-item" th:each="lec : ${privateLectures}">
+            <div>
+              <strong th:text="${lec.title}"></strong>
+
+              <!-- 강의 평균 진도율 (승인된 강의만 의미가 있으므로 approvedNos 체크) -->
+              <span class="progress-info"
+                    th:if="${approvedNos.contains(lec.lectureNo)}"
+                    th:text="'진도: ' + ${lectureProgressMap[lec.lectureNo]} + '%'">진도: 0%</span>
+
+              <!-- 신청 상태 -->
+              <span th:if="${pendingNos.contains(lec.lectureNo)}">수강신청 중</span>
+              <a   th:if="${approvedNos.contains(lec.lectureNo)}"
+                   th:href="@{/lectures/{lectureNo}(lectureNo=${lec.lectureNo})}">강의보기</a>
+
+              <!-- 캘린더 버튼 -->
+              <form th:action="@{/calendar/add}" method="post"
+                    th:if="${!scheduledLectures.contains(lec.lectureNo)}">
+                <input type="hidden" name="lectureNo" th:value="${lec.lectureNo}">
+                <button type="submit">캘린더에 추가</button>
+              </form>
+              <form th:action="@{/calendar/removeLecture}" method="post"
+                    th:if="${scheduledLectures.contains(lec.lectureNo)}">
+                <input type="hidden" name="lectureNo" th:value="${lec.lectureNo}">
+                <button type="submit">캘린더에서 제거</button>
+              </form>
+            </div>
+
+            <!-- 승인된 강의의 챕터 진도율 표시 -->
+            <ul class="video-sublist"
+                th:if="${approvedNos.contains(lec.lectureNo)}"
+                th:each="vid : ${videosByLecture[lec.lectureNo]}">
+              <li class="chapter-item">
+                <a th:href="@{'/lecture/watch/' + ${vid.videoNo}}"
+                   th:text="${vid.videoPath}">챕터</a>
+                <span class="chapter-progress"
+                      th:text="'진도: ' + ${videoProgressMap[vid.videoNo]} + '%'">진도: 0%</span>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+    </div><!-- tab_container -->
+  </main>
+</div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+document.addEventListener('DOMContentLoaded', () => {
+
+  const calendarEl = document.getElementById('calendar');
+  const eventsData = JSON.parse(calendarEl.dataset.events || '[]');
+
+  /* ---------------- 헬퍼: 날짜(YYYY-MM-DD) 반환 ---------------- */
+  const toDateStr = d =>
+      `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+  /* ---------------- 헬퍼: 셀 배경색 갱신 ----------------------- */
+  function paintCellIfCompleted(dateStr, cellEl) {
+    const todays = eventsData.filter(ev => ev.eventDate === dateStr);
+    if (todays.length && todays.every(ev => ev.progressPct >= 100)) {
+      cellEl.classList.add('fc-day-green');      // 모두 100 %
+    } else {
+      cellEl.classList.remove('fc-day-green');   // 하나라도 미완료
+    }
+  }
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+
+    /* -------- 이벤트 데이터 -------- */
+    events: eventsData.map(ev => ({
+      id        : ev.eventId,
+      start     : ev.eventDate,
+      url       : '/lecture/watch/' + ev.videoNo,
+      classNames: ['event-' + ev.status.toLowerCase()],
+      title     : (ev.status === 'COMPLETED' ? '수강 완료'
+                 : ev.status === 'MISSED'    ? '미수강'
+                 : '강의 ' + ev.videoNo) + ` (${ev.progressPct}%)`,
+      progressPct: ev.progressPct              //  ← custom field
+    })),
+
+    /* -------- 날짜 셀 처음 그릴 때 -------- */
+    dayCellDidMount({ date, el }) {
+      paintCellIfCompleted(toDateStr(date), el);
+    },
+
+    /* -------- 이벤트가 DOM에 붙을 때 -------- */
+    eventDidMount({ event, el }) {
+      const dateStr = toDateStr(event.start);
+      const cellEl  = el.closest('td[data-date]');   // 해당 day-cell
+      if (cellEl) paintCellIfCompleted(dateStr, cellEl);
+    },
+
+    /* -------- 나중에 이벤트가 갱신될 때(선택) -------- */
+    eventChange({ event }) {
+      const dateStr = toDateStr(event.start);
+      const cellEl  = calendarEl.querySelector(`td[data-date="${dateStr}"]`);
+      if (cellEl) paintCellIfCompleted(dateStr, cellEl);
+    }
+  });
+
+  calendar.render();
+});
+/*]]>*/
+</script>
+</body>
+</html>

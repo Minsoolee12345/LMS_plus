@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.site.lms.mapper.LectureMapper">
+
+  <select id="existsById" resultType="int" parameterType="long">
+    SELECT COUNT(*)
+    FROM LECTURE
+    WHERE LECTURE_NO = #{lectureNo, jdbcType=NUMERIC}
+  </select>
+
+  <select id="findById" parameterType="long" resultType="com.site.lms.entity.Lecture">
+    SELECT
+      LECTURE_NO     AS lectureNo,
+      INSTRUCTOR_NO  AS instructorNo,
+      TITLE,
+      LECTURE_DESC   AS lectureDesc,
+      CREATED_DATE   AS createdDate,
+      VISIBILITY
+    FROM LECTURE
+    WHERE LECTURE_NO = #{lectureNo, jdbcType=NUMERIC}
+  </select>
+
+  <select id="findByInstructor" parameterType="long" resultType="com.site.lms.entity.Lecture">
+    SELECT
+      LECTURE_NO     AS lectureNo,
+      INSTRUCTOR_NO  AS instructorNo,
+      TITLE,
+      LECTURE_DESC   AS lectureDesc,
+      CREATED_DATE   AS createdDate,
+      VISIBILITY
+    FROM LECTURE
+    WHERE INSTRUCTOR_NO = #{instructorNo, jdbcType=NUMERIC}
+    ORDER BY CREATED_DATE DESC
+  </select>
+
+  <delete id="deleteById" parameterType="long">
+    DELETE FROM LECTURE
+    WHERE LECTURE_NO = #{lectureNo, jdbcType=NUMERIC}
+  </delete>
+
+  <update id="update" parameterType="com.site.lms.entity.Lecture">
+    UPDATE LECTURE
+       SET TITLE        = #{title, jdbcType=VARCHAR},
+           LECTURE_DESC = #{lectureDesc, jdbcType=CLOB},
+           VISIBILITY   = #{visibility, jdbcType=NUMERIC}
+     WHERE LECTURE_NO  = #{lectureNo, jdbcType=NUMERIC}
+  </update>
+
+  <select id="findByVisibility" parameterType="int" resultType="com.site.lms.entity.Lecture">
+    SELECT
+      LECTURE_NO     AS lectureNo,
+      INSTRUCTOR_NO  AS instructorNo,
+      TITLE,
+      LECTURE_DESC   AS lectureDesc,
+      CREATED_DATE   AS createdDate,
+      VISIBILITY
+    FROM LECTURE
+    WHERE VISIBILITY = #{visibility, jdbcType=NUMERIC}
+    ORDER BY CREATED_DATE DESC
+  </select>
+
+  <select id="findByIds" parameterType="list" resultType="com.site.lms.entity.Lecture">
+    SELECT
+      LECTURE_NO     AS lectureNo,
+      INSTRUCTOR_NO  AS instructorNo,
+      TITLE,
+      LECTURE_DESC   AS lectureDesc,
+      CREATED_DATE   AS createdDate,
+      VISIBILITY
+    FROM LECTURE
+    WHERE LECTURE_NO IN
+    <foreach item="id" collection="ids" open="(" separator="," close=")">
+      #{id, jdbcType=NUMERIC}
+    </foreach>
+  </select>
+
+  <insert id="insertLecture" parameterType="com.site.lms.entity.Lecture">
+    <selectKey keyProperty="lectureNo" resultType="long" order="BEFORE">
+      SELECT SEQ_LECTURE_NO.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO LECTURE (
+      LECTURE_NO,
+      INSTRUCTOR_NO,
+      TITLE,
+      LECTURE_DESC,
+      VISIBILITY,
+      CREATED_DATE
+    ) VALUES (
+      #{lectureNo, jdbcType=NUMERIC},
+      #{instructorNo, jdbcType=NUMERIC},
+      #{title, jdbcType=VARCHAR},
+      #{lectureDesc, jdbcType=CLOB},
+      #{visibility, jdbcType=NUMERIC},
+      SYSDATE
+    )
+  </insert>
+
+</mapper>

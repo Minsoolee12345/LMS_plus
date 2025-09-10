@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.site.lms.mapper.FavoriteMapper">
+
+  <insert id="save" parameterType="com.site.lms.entity.Favorite">
+    <selectKey keyProperty="id" resultType="long" order="BEFORE">
+      SELECT SEQ_FAVORITE_NO.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO FAVORITES
+      (FAVORITE_NO, MEMBER_NO, TARGET_TYPE, TARGET_ID, CREATED_DATE)
+    VALUES
+      (#{id}, #{memberNo}, #{targetType}, #{targetId}, SYSDATE)
+  </insert>
+
+  <delete id="delete">
+    DELETE FROM FAVORITES
+     WHERE MEMBER_NO   = #{memberNo}
+       AND TARGET_TYPE = #{targetType}
+       AND TARGET_ID   = #{targetId}
+  </delete>
+
+  <!-- 강의 즐겨찾기 -->
+  <select id="findLectureNosByMember" parameterType="long" resultType="long">
+    SELECT TARGET_ID
+      FROM FAVORITES
+     WHERE MEMBER_NO   = #{memberNo}
+       AND TARGET_TYPE = 'LECTURE'
+     ORDER BY CREATED_DATE DESC
+  </select>
+
+  <!-- 챕터 즐겨찾기 -->
+  <select id="findChapterNosByMember" parameterType="long" resultType="long">
+    SELECT TARGET_ID
+      FROM FAVORITES
+     WHERE MEMBER_NO   = #{memberNo}
+       AND TARGET_TYPE = 'CHAPTER'
+     ORDER BY CREATED_DATE DESC
+  </select>
+
+</mapper>

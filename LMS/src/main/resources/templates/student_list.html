@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout :: head"></head>
+<body>
+<header th:replace="~{layout :: header}"></header>
+  <div class="layout">
+    <main class="content">
+<div class="container" style="margin-top:30px;">
+  <h1 class="text-primary">내 수강생</h1>
+
+  <div th:each="entry : ${map}" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title" th:text="${entry.key.title}">강의 제목</h2>
+    </div>
+    <div class="panel-body">
+      <table class="table table-striped table-bordered table-hover">
+        <thead>
+          <tr><th>ID</th><th>진행도</th><th>권한</th></tr>
+        </thead>
+        <tbody>
+          <tr th:each="stu : ${entry.value}">
+            <td th:text="${stu.username}"></td>
+            <td>
+              <div class="progress" style="margin-bottom:0;">
+                <div class="progress-bar" role="progressbar" 
+                     aria-valuenow="${stu.progress}" 
+                     aria-valuemin="0" aria-valuemax="100" 
+                     th:style="'width:' + ${stu.progress} + '%'">
+                  <span th:text="${stu.progress} + '%'"></span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <form th:action="@{/instructor/lectures/{lec}/students/{stu}(lec=${entry.key.lectureNo}, stu=${stu.id})}"
+                    method="post" style="display:inline;">
+                <select name="authority" class="form-control input-sm" style="width:auto; display:inline-block;">
+                  <option value="USER" th:selected="${stu.authority == 'USER'}">수강생</option>
+                  <option value="ADMIN" th:selected="${stu.authority == 'ADMIN'}">관리자</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">수정</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+  </main>
+</div>
+</body>
+</html>

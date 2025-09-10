@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>강의 등록</title>
+
+  <!-- 공통 head 프래그먼트 -->
+  <th:block th:insert="~{layout :: head}"></th:block>
+
+  <!-- 페이지 전용 CSS (공통보다 뒤쪽) -->
+  <style>
+    /* ───────── 색상 변수 ───────── */
+    :root{
+      --bs-primary:#337ab7;
+      --bs-primary-dark:#2e6da4;
+      --bs-danger:#e74c3c;
+      --bs-danger-dark:#c0392b;
+    }
+
+    /* ───────── 기본 레이아웃 & 타이포 ───────── */
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;background:#f9f9fb}
+    h1{color:var(--bs-primary);margin:0 0 24px;font-weight:700}
+
+    .layout{max-width:940px;margin:0 auto}
+    .content{padding:16px}
+
+    /* ───────── 폼 ───────── */
+    form{background:#fff;border:1px solid var(--bs-primary);border-radius:8px;padding:24px;
+         box-shadow:0 4px 12px rgba(0,0,0,.04)}
+    .form-group{margin-bottom:18px}
+    label{display:block;font-weight:600;margin-bottom:6px;color:#333}
+    input[type="text"],
+    textarea,
+    select{
+      width:100%;
+      padding:8px 10px;
+      border:1px solid #ccc;
+      border-radius:4px;
+      font-size:1rem;
+      box-sizing:border-box
+    }
+    textarea{min-height:120px;resize:vertical}
+
+    /* ───────── 버튼 ───────── */
+    .btn{
+      border:none;
+      border-radius:4px;
+      padding:8px 16px;
+      cursor:pointer;
+      font-weight:600;
+      transition:background-color .2s,color .2s
+    }
+    .btn-primary{
+      background:var(--bs-primary);
+      color:#fff
+    }
+    .btn-primary:hover{background:var(--bs-primary-dark)}
+
+    /* 링크(공통) */
+    a{color:var(--bs-primary)}
+    a:hover{color:var(--bs-primary-dark)}
+  </style>
+</head>
+
+<body>
+<header th:replace="~{layout :: header}"></header>
+
+<div class="layout">
+  <main class="content">
+    <h1>📝 강의 등록</h1>
+
+    <form th:action="@{/instructor/lectures}"
+          th:object="${lecture}" method="post">
+
+      <div class="form-group">
+        <label for="title">제목</label>
+        <input id="title" type="text" th:field="*{title}" placeholder="강의 제목을 입력하세요">
+      </div>
+
+      <div class="form-group">
+        <label for="desc">설명</label>
+        <textarea id="desc" th:field="*{lectureDesc}"
+                  placeholder="강의 설명을 입력하세요"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="vis">공개 권한</label>
+        <select id="vis" th:field="*{visibility}">
+          <option th:value="1">전체 공개</option>
+          <option th:value="2">일부 공개</option>
+          <option th:value="0">비공개</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary">등록</button>
+    </form>
+  </main>
+</div>
+</body>
+</html>

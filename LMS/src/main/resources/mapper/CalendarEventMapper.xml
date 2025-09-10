@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.site.lms.mapper.CalendarEventMapper">
+
+  <!-- 신규 일정 삽입 -->
+  <insert id="insert" parameterType="map">
+    <!-- Oracle 시퀀스 사용 -->
+    <selectKey keyProperty="eventId" resultType="long" order="BEFORE">
+      SELECT SEQ_CAL_EVENT.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO CALENDAR_EVENT
+      (EVENT_ID, MEMBER_NO, VIDEO_NO, EVENT_DATE, STATUS, CREATED_DATE, PROGRESS_PCT)
+    VALUES
+      (#{eventId},
+       #{memberNo},
+       #{videoNo},
+       #{eventDate},
+       'SCHEDULED',
+       SYSDATE,
+       0
+      )
+  </insert>
+
+  <!-- 회원별 일정 조회 (진도율 포함) -->
+  <select id="findByMember"
+          resultType="com.site.lms.entity.CalendarEvent"
+          parameterType="long">
+    SELECT
+      EVENT_ID       AS eventId,
+      MEMBER_NO      AS memberNo,
+      VIDEO_NO       AS videoNo,
+      EVENT_DATE     AS eventDate,
+      STATUS         AS status,
+      CREATED_DATE   AS createdDate,
+      PROGRESS_PCT   AS progressPct
+    FROM CALENDAR_EVENT
+    WHERE MEMBER_NO = #{memberNo}
+    ORDER BY EVENT_DATE
+  </select>
+
+  <!-- 상태만 업데이트 -->
+  <update id="updateStatus" parameterType="map">
+    UPDATE CALENDAR_EVENT
+       SET STATUS = #{status}
+     WHERE EVENT_ID = #{eventId}
+  </update>
+
+  <!-- 일정 날짜 이동 (쉬는 날) -->
+  <update id="shiftEvent" parameterType="map">
+    UPDATE CALENDAR_EVENT
+       SET EVENT_DATE = #{newDate}
+     WHERE EVENT_ID = #{eventId}
+  </update>
+
+  <!-- 일정 삭제 (캘린더에서 개별 이벤트 제거) -->
+  <delete id="deleteEvent" parameterType="long">
+    DELETE FROM CALENDAR_EVENT
+     WHERE EVENT_ID = #{eventId}
+  </delete>
+
+  <!-- 회원+강의 전체 삭제 (강의 단위로 일정 제거) -->
+  <delete id="deleteByLecture" parameterType="map">
+    DELETE FROM CALENDAR_EVENT
+     WHERE MEMBER_NO = #{memberNo}
+       AND VIDEO_NO IN (
+         SELECT VIDEO_NO
+           FROM LECTURE_VIDEO
+          WHERE LECTURE_NO = #{lectureNo}
+       )
+  </delete>
+  
+  <update id="updateProgressAndStatus" parameterType="map">
+  UPDATE CALENDAR_EVENT
+     SET PROGRESS_PCT = #{pct},
+         STATUS       = #{status}
+   WHERE EVENT_ID     = #{eventId}
+</update>
+
+</mapper>

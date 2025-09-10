@@ -1,0 +1,14 @@
+/* 오늘 날짜 강조 */
+.fc-day-today {
+  background: #fffae6;
+}
+
+/* 완료된 일정 스타일 */
+.event-completed {
+  text-decoration: line-through;
+}
+
+/* 미수강 일정 스타일 */
+.event-missed {
+  color: red;
+}

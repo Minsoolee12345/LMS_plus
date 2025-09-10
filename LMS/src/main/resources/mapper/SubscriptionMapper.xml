@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.site.lms.mapper.SubscriptionMapper">
+
+	
+  <!-- 1) 컬럼→프로퍼티 매핑을 명시하는 resultMap -->
+  <resultMap id="SubscriptionResult" type="com.site.lms.entity.Subscription">
+    <id     column="SUB_ID"       property="subId"/>
+    <result column="MEMBER_NO"    property="memberNo"/>
+    <result column="LECTURE_NO"   property="lectureNo"/>
+    <result column="STATUS"       property="status"/>
+    <result column="REQUEST_DATE" property="requestDate"/>
+  </resultMap>
+
+  <!-- 2) INSERT: 그대로 -->
+  <insert id="insert" parameterType="com.site.lms.entity.Subscription">
+    <selectKey keyProperty="subId" resultType="long" order="BEFORE">
+      SELECT SEQ_SUB.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO SUBSCRIPTION
+      (SUB_ID, MEMBER_NO, LECTURE_NO, STATUS, REQUEST_DATE)
+    VALUES
+      (#{subId}, #{memberNo}, #{lectureNo}, #{status}, SYSDATE)
+  </insert>
+
+  <!-- 3) findByMember: resultMap 적용 -->
+  <select id="findByMember"
+          resultMap="SubscriptionResult"
+          parameterType="long">
+    SELECT *
+      FROM SUBSCRIPTION
+     WHERE MEMBER_NO = #{memberNo}
+     ORDER BY REQUEST_DATE DESC
+  </select>
+
+  <!-- 4) findByMemberAndLecture: resultMap 적용 -->
+  <select id="findByMemberAndLecture"
+          resultMap="SubscriptionResult"
+          parameterType="map">
+    SELECT *
+      FROM SUBSCRIPTION
+     WHERE MEMBER_NO  = #{memberNo}
+       AND LECTURE_NO = #{lectureNo}
+  </select>
+
+  <!-- 5) updateStatus: 그대로 -->
+  <update id="updateStatus" parameterType="com.site.lms.entity.Subscription">
+    UPDATE SUBSCRIPTION
+       SET STATUS = #{status}
+     WHERE SUB_ID = #{subId}
+  </update>
+  
+  <!-- 6) subId 로 단건 조회 (APPROVE/REJECT 처리 시 사용) -->
+  <select id="findById"
+          parameterType="long"
+          resultMap="SubscriptionResult">
+    SELECT *
+      FROM SUBSCRIPTION
+     WHERE SUB_ID = #{subId}
+  </select>
+  
+  <!-- SubscriptionMapper.xml -->
+	<select id="findByLecture"
+	        resultMap="SubscriptionResult"
+	        parameterType="long">
+	  SELECT * 
+	    FROM SUBSCRIPTION
+	   WHERE LECTURE_NO = #{lectureNo}
+	   ORDER BY REQUEST_DATE DESC
+	</select>
+  
+  <!-- 추가: 특정 lectureNo 에 속한 subscription 모두 삭제 -->
+  <delete id="deleteByLecture" parameterType="long">
+    DELETE FROM SUBSCRIPTION
+     WHERE LECTURE_NO = #{lectureNo}
+  </delete>
+</mapper>

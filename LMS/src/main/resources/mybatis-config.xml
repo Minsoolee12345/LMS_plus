@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <!-- 1) 언더스코어→카멜케이스 자동 매핑 -->
+  <settings>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+  </settings>
+
+  <!-- 2) 엔티티 스캔 -->
+  <typeAliases>
+    <package name="com.site.lms.entity"/>
+  </typeAliases>
+
+  <!-- 3) Mapper XML 등록 -->
+  <mappers>
+    <mapper resource="mapper/CalendarEventMapper.xml"/>
+    <mapper resource="mapper/FavoriteMapper.xml"/>
+    <mapper resource="mapper/LectureMapper.xml"/>
+    <mapper resource="mapper/LectureVideoMapper.xml"/>
+    <mapper resource="mapper/ProgressMapper.xml"/>
+    <mapper resource="mapper/SubscriptionMapper.xml"/>
+  </mappers>
+</configuration>

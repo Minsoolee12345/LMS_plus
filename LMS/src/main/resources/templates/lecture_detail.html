@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${lecture.title} + ' - 상세'">강의 상세</title>
+
+  <!-- 공통 head 프래그먼트 -->
+  <th:block th:insert="~{layout :: head}"></th:block>
+
+  <!-- 공통/페이지 전용 CSS -->
+  <style>
+    /* ───────── 색상 변수 ───────── */
+    :root{
+      --bs-primary:#337ab7;
+      --bs-primary-dark:#2e6da4;
+      --bs-danger:#e74c3c;
+      --bs-danger-dark:#c0392b;
+    }
+
+    /* ───────── 기본 레이아웃 & 타이포 ───────── */
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;background:#f9f9fb}
+    h1,h2{color:var(--bs-primary);margin:0 0 20px}
+
+    .layout{max-width:940px;margin:0 auto}
+    .content{padding:16px}
+
+    /* ───────── 챕터 리스트 ───────── */
+    .chapter-list{list-style:none;padding:0}
+    .chapter-item{margin-bottom:12px}
+    .chapter-item a{
+      text-decoration:none;
+      color:var(--bs-primary);
+      font-weight:600;
+      transition:color .2s
+    }
+    .chapter-item a:hover{color:var(--bs-primary-dark)}
+
+    /* 링크(공통) */
+    a{color:var(--bs-primary)}
+    a:hover{color:var(--bs-primary-dark)}
+  </style>
+</head>
+
+<body>
+  <div th:replace="~{layout :: header}"></div>
+
+  <div class="layout">
+    <main class="content">
+      <h1 th:text="${lecture.title}">강의 제목</h1>
+      <p th:text="'강사: ' + ${lecture.instructorNo}">강사 번호</p>
+      <p th:text="'설명: ' + ${lecture.lectureDesc}">강의 설명</p>
+
+      <h2>챕터 목록</h2>
+      <ul class="chapter-list">
+        <li th:each="chap : ${chapters}" class="chapter-item">
+          <a th:href="@{'/lecture/watch/' + ${chap.videoNo}}"
+             th:text="'챕터 ' + ${chap.videoNo} + ' – ' + ${chap.videoPath}">
+            챕터 링크
+          </a>
+        </li>
+      </ul>
+
+      <p><a th:href="@{/lectures/search}">← 검색으로 돌아가기</a></p>
+    </main>
+  </div>
+</body>
+</html>

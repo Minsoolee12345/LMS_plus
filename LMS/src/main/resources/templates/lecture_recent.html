@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>최근 본 강의</title>
+
+  <!-- 공통 head 프래그먼트 -->
+  <th:block th:insert="~{layout :: head}"></th:block>
+
+  <!-- 페이지 전용 CSS (공통보다 뒤쪽) -->
+  <style>
+    /* ───────── 색상 변수 ───────── */
+    :root{
+      --bs-primary:#337ab7;
+      --bs-primary-dark:#2e6da4;
+      --bs-danger:#e74c3c;
+      --bs-danger-dark:#c0392b;
+    }
+
+    /* ───────── 기본 레이아웃 & 타이포 ───────── */
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;background:#f9f9fb}
+    h1{color:var(--bs-primary);margin:0 0 24px;font-weight:700}
+
+    .layout{max-width:940px;margin:0 auto}
+    .content{padding:16px}
+
+    /* ───────── 최근 본 강의 리스트 ───────── */
+    ul{list-style:none;padding-left:0}
+    li{margin-bottom:14px;font-size:1.05em}
+
+    a{
+      text-decoration:none;
+      color:var(--bs-primary);
+      transition:color .2s
+    }
+    a:hover{color:var(--bs-primary-dark)}
+  </style>
+</head>
+
+<body>
+  <!-- 공통 header -->
+  <header th:replace="~{layout :: header}"></header>
+
+  <div class="layout">
+    <main class="content">
+      <h1>🕒 최근 본 강의</h1>
+
+      <div th:if="${#lists.isEmpty(recentViews)}">
+        아직 본 강의가 없습니다.
+      </div>
+
+      <ul th:if="${!#lists.isEmpty(recentViews)}">
+        <li th:each="rv : ${recentViews}">
+          <a th:href="@{|/lectures/${rv.lecture.lectureNo}|}"
+             th:text="${rv.lecture.title}">강의 제목</a>
+          &nbsp;—&nbsp;
+          <a th:href="@{|/lecture/watch/${rv.video.videoNo}|}"
+             th:text="'챕터 ' + ${rv.video.videoNo}">챕터</a>
+        </li>
+      </ul>
+    </main>
+  </div>
+</body>
+</html>

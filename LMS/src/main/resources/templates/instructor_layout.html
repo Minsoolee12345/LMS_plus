@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>강사용 레이아웃</title></head>
+<body>
+<nav>
+  <a th:href="@{/}">일반 메뉴</a> |
+  <a th:href="@{/instructor/lectures/new}">강의 등록</a> |
+  <a th:href="@{/instructor/lectures}">내 강의</a> |
+  <a th:href="@{/instructor/students}">내 수강생</a> |
+  <a th:href="@{/instructor/switch-off}">일반 메뉴 전환</a>
+</nav>
+<div th:replace="~{::section}"></div>
+</body>
+</html>

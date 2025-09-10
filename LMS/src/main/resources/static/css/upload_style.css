@@ -1,0 +1,42 @@
+
+
+.image-preview-input {
+    position: relative;
+    overflow: hidden;
+    margin: 20px;    
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;    
+}
+
+.image-preview-input-title {
+    margin-left:2px;
+}
+
+/* 업로드 로딩 css */
+#loader-8:before{
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: calc(50% - 10px);
+  left: 0px;
+  background-color: #3498db;
+  animation: rotatemove 1s infinite;
+}
+
+@keyframes rotatemove{
+  0%{
+    -webkit-transform: scale(1) translateX(0px);
+    -ms-transform: scale(1) translateX(0px);
+    -o-transform: scale(1) translateX(0px);
+    transform: scale(1) translateX(0px);
+  }
+
+  100%{
+    -webkit-transform: scale(2) translateX(45px);
+    -ms-transform: scale(2) translateX(45px);
+    -o-transform: scale(2) translateX(45px);
+    transform: scale(2) translateX(45px);
+  }
+}

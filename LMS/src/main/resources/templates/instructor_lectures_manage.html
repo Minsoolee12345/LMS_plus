@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>내 수강생 관리</title>
+
+  <!-- 공통 head 프래그먼트 -->
+  <th:block th:insert="~{layout :: head}"></th:block>
+
+  <!-- 페이지 전용 CSS (공통보다 뒤쪽) -->
+  <style>
+    /* ───────── 색상 변수 ───────── */
+    :root{
+      --bs-primary:#337ab7;
+      --bs-primary-dark:#2e6da4;
+      --bs-danger:#e74c3c;
+      --bs-danger-dark:#c0392b;
+    }
+
+    /* ───────── 기본 레이아웃 & 타이포 ───────── */
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;background:#f9f9fb}
+    h1,h2{color:var(--bs-primary);margin:0 0 20px}
+
+    .layout{max-width:940px;margin:0 auto}
+    .content{padding:16px}
+
+    /* ───────── 강의 카드 ───────── */
+    .course{
+      margin-bottom:40px;
+      border:1px solid var(--bs-primary);
+      border-radius:8px;
+      padding:20px;
+      background:#fff
+    }
+    .course-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center
+    }
+
+    /* ───────── 테이블 ───────── */
+    table{width:100%;border-collapse:collapse;margin-top:16px}
+    th,td{border:1px solid #ccc;padding:8px;text-align:center}
+    thead th{background:var(--bs-primary);color:#fff}
+    tbody tr:nth-child(odd){background:#fafafa}
+
+    /* ───────── 버튼 ───────── */
+    .btn{
+      border:none;
+      border-radius:4px;
+      padding:6px 12px;
+      cursor:pointer;
+      font-weight:600;
+      transition:background-color .2s,color .2s
+    }
+    .btn-primary{
+      background:var(--bs-primary);
+      color:#fff
+    }
+    .btn-primary:hover{background:var(--bs-primary-dark)}
+    .btn-danger{
+      background:var(--bs-danger);
+      color:#fff
+    }
+    .btn-danger:hover{background:var(--bs-danger-dark)}
+
+    /* 인라인 폼 스타일 */
+    form.inline{display:inline}
+
+    /* 링크 색상 */
+    a{color:var(--bs-primary)}
+    a:hover{color:var(--bs-primary-dark)}
+  </style>
+</head>
+
+<body>
+  <div th:replace="~{layout :: header}"></div>
+
+  <div class="layout">
+    <main class="content">
+      <h1>🔄 내 강의·영상 관리</h1>
+
+      <div th:each="lec : ${lectures}" class="lecture">
+        <div class="lecture-header">
+          <h2 th:text="'강의 ' + ${lec.lectureNo} + ' – ' + ${lec.title}">강의 제목</h2>
+
+          <!-- 과목 삭제 -->
+          <form th:action="@{/lecture/delete/{lectureNo}(lectureNo=${lec.lectureNo})}"
+                method="post"
+                onsubmit="return confirm('정말 이 과목과 모든 첨부 영상을 삭제하시겠습니까?');">
+            <button type="submit" class="btn btn-danger">과목 삭제</button>
+          </form>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>영상번호</th>
+              <th>파일명</th>
+              <th>공개 상태</th>
+              <th>변경</th>
+              <th>삭제</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="vid : ${videosByLecture[lec.lectureNo]}">
+              <td th:text="${vid.videoNo}">1</td>
+              <td th:text="${vid.videoPath}">video.mp4</td>
+              <td th:text="${vid.visibility == 1 ? '전체 공개' : vid.visibility == 2 ? '부분 공개' : '비공개'}">
+                공개 상태
+              </td>
+              <td>
+                <!-- 공개 상태 변경 -->
+                <form th:action="@{/instructor/lectures/manage/video/update}"
+                      method="post" class="inline">
+                  <input type="hidden" name="videoNo" th:value="${vid.videoNo}">
+                  <select name="visibility">
+                    <option value="1" th:selected="${vid.visibility==1}">전체 공개</option>
+                    <option value="2" th:selected="${vid.visibility==2}">부분 공개</option>
+                    <option value="0" th:selected="${vid.visibility==0}">비공개</option>
+                  </select>
+                  <button type="submit" class="btn btn-primary" style="padding:4px 10px">저장</button>
+                </form>
+              </td>
+              <td>
+                <!-- 영상 삭제 -->
+                <form th:action="@{/instructor/lectures/manage/video/delete}"
+                      method="post"
+                      onsubmit="return confirm('정말 삭제하시겠습니까?');"
+                      class="inline">
+                  <input type="hidden" name="videoNo" th:value="${vid.videoNo}">
+                  <button type="submit" class="btn btn-danger" style="padding:4px 10px">삭제</button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><a th:href="@{/}">← 홈으로</a></p>
+    </main>
+  </div>
+</body>
+</html>

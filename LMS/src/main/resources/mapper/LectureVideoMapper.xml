@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.site.lms.mapper.LectureVideoMapper">
+
+  <!-- 저장 -->
+  <insert id="save" parameterType="com.site.lms.entity.LectureVideo">
+    <selectKey keyProperty="videoNo" resultType="long" order="BEFORE">
+      SELECT SEQ_VIDEO_NO.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO LECTURE_VIDEO
+      (VIDEO_NO, LECTURE_NO, VIDEO_PATH, VIDEO_DESC,
+       WORDSET, RAW_TEXT, SEGMENTS_JSON,
+       VISIBILITY, UPLOADER_NO, SUMMARY, CREATED_DATE)
+    VALUES
+      (#{videoNo,jdbcType=NUMERIC},
+       #{lectureNo,jdbcType=NUMERIC},
+       #{videoPath,jdbcType=VARCHAR},
+       #{videoDesc,jdbcType=VARCHAR},
+       #{wordset,jdbcType=CLOB},
+       #{rawText,jdbcType=CLOB},
+       #{segmentsJson,jdbcType=CLOB},
+       #{visibility,jdbcType=NUMERIC},
+       #{uploaderNo,jdbcType=NUMERIC},
+       #{summary,jdbcType=CLOB},
+       SYSDATE)
+  </insert>
+
+  <!-- 수정 -->
+  <update id="update" parameterType="com.site.lms.entity.LectureVideo">
+    UPDATE LECTURE_VIDEO
+       SET LECTURE_NO    = #{lectureNo,jdbcType=NUMERIC},
+           VIDEO_PATH    = #{videoPath,jdbcType=VARCHAR},
+           VIDEO_DESC    = #{videoDesc,jdbcType=VARCHAR},
+           WORDSET       = #{wordset,jdbcType=CLOB},
+           RAW_TEXT      = #{rawText,jdbcType=CLOB},
+           SEGMENTS_JSON = #{segmentsJson,jdbcType=CLOB},
+           VISIBILITY    = #{visibility,jdbcType=NUMERIC},
+           UPLOADER_NO   = #{uploaderNo,jdbcType=NUMERIC},
+           SUMMARY       = #{summary,jdbcType=CLOB}
+     WHERE VIDEO_NO      = #{videoNo,jdbcType=NUMERIC}
+  </update>
+
+  <!-- 단일 조회 -->
+  <select id="findById" parameterType="long" resultType="com.site.lms.entity.LectureVideo">
+    SELECT
+      VIDEO_NO      AS videoNo,
+      LECTURE_NO    AS lectureNo,
+      VIDEO_PATH    AS videoPath,
+      VIDEO_DESC    AS videoDesc,
+      WORDSET       AS wordset,
+      RAW_TEXT      AS rawText,
+      SEGMENTS_JSON AS segmentsJson,
+      VISIBILITY,
+      UPLOADER_NO   AS uploaderNo,
+      SUMMARY       AS summary
+    FROM LECTURE_VIDEO
+    WHERE VIDEO_NO = #{videoNo,jdbcType=NUMERIC}
+  </select>
+
+  <!-- 과목별 전체 조회 -->
+  <select id="findByLectureNo" parameterType="long" resultType="com.site.lms.entity.LectureVideo">
+    SELECT
+      VIDEO_NO      AS videoNo,
+      LECTURE_NO    AS lectureNo,
+      VIDEO_PATH    AS videoPath,
+      VIDEO_DESC    AS videoDesc,
+      WORDSET       AS wordset,
+      RAW_TEXT      AS rawText,
+      SEGMENTS_JSON AS segmentsJson,
+      VISIBILITY,
+      UPLOADER_NO   AS uploaderNo,
+      SUMMARY       AS summary
+    FROM LECTURE_VIDEO
+    WHERE LECTURE_NO = #{lectureNo,jdbcType=NUMERIC}
+    ORDER BY VIDEO_NO
+  </select>
+
+  <!-- 키워드 기반 과목 조회 (기존) -->
+  <select id="findLectureNosByTopKeyword" parameterType="String" resultType="long">
+    SELECT DISTINCT LECTURE_NO
+      FROM LECTURE_VIDEO
+     WHERE LOWER(WORDSET) LIKE '%' || LOWER(#{keyword,jdbcType=VARCHAR}) || '%'
+  </select>
+
+  <!-- 업로더 기준 과목 번호 조회 (추가) -->
+  <select id="findLectureNosByUploader" parameterType="long" resultType="long">
+    SELECT DISTINCT LECTURE_NO
+      FROM LECTURE_VIDEO
+     WHERE UPLOADER_NO = #{uploaderNo,jdbcType=NUMERIC}
+     ORDER BY LECTURE_NO
+  </select>
+
+  <!-- 과목+업로더 기준 영상 조회 (추가) -->
+  <select id="findByLectureNoAndUploader"
+          parameterType="map"
+          resultType="com.site.lms.entity.LectureVideo">
+    SELECT
+      VIDEO_NO      AS videoNo,
+      LECTURE_NO    AS lectureNo,
+      VIDEO_PATH    AS videoPath,
+      VIDEO_DESC    AS videoDesc,
+      WORDSET       AS wordset,
+      RAW_TEXT      AS rawText,
+      SEGMENTS_JSON AS segmentsJson,
+      VISIBILITY,
+      UPLOADER_NO   AS uploaderNo,
+      SUMMARY       AS summary
+    FROM LECTURE_VIDEO
+    WHERE LECTURE_NO  = #{lectureNo,jdbcType=NUMERIC}
+      AND UPLOADER_NO = #{uploaderNo,jdbcType=NUMERIC}
+    ORDER BY VIDEO_NO
+  </select>
+
+  <!-- 삭제 -->
+  <delete id="deleteById" parameterType="long">
+    DELETE FROM LECTURE_VIDEO WHERE VIDEO_NO = #{videoNo,jdbcType=NUMERIC}
+  </delete>
+
+  <!-- ID 목록으로 Video 조회 -->
+  <select id="findByIds" parameterType="list" resultType="com.site.lms.entity.LectureVideo">
+    SELECT
+      VIDEO_NO      AS videoNo,
+      LECTURE_NO    AS lectureNo,
+      VIDEO_PATH    AS videoPath,
+      VIDEO_DESC    AS videoDesc,
+      WORDSET       AS wordset,
+      RAW_TEXT      AS rawText,
+      SEGMENTS_JSON AS segmentsJson,
+      VISIBILITY,
+      UPLOADER_NO   AS uploaderNo,
+      SUMMARY       AS summary
+    FROM LECTURE_VIDEO
+    WHERE VIDEO_NO IN
+    <foreach item="id" collection="ids" open="(" separator="," close=")">
+      #{id,jdbcType=NUMERIC}
+    </foreach>
+  </select>
+  
+   <!-- ★ 추가: 특정 과목의 모든 영상 삭제 -->
+  <delete id="deleteByLecture" parameterType="long">
+    DELETE FROM LECTURE_VIDEO
+    WHERE LECTURE_NO = #{lectureNo}
+  </delete>
+</mapper>
