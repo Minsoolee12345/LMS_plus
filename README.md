@@ -73,3 +73,9 @@ LMS+는 기존 학습 관리 시스템(LMS)에 **인공지능 기반 기능**을
   IV. 학습 진도율 저장 → 이어보기  
 
 ---
+
+## 인터페이스 구성
+<img width="1271" height="1148" alt="image" src="https://github.com/user-attachments/assets/c8756bfd-1986-42db-b3c8-a3344d34f254" />
+<img width="1320" height="1272" alt="image" src="https://github.com/user-attachments/assets/1cf292eb-6f3f-4fc9-b67c-202b2b6da1f8" />
+
+
