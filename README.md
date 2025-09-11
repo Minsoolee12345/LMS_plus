@@ -74,7 +74,7 @@ LMS+는 기존 학습 관리 시스템(LMS)에 **인공지능 기반 기능**을
 
 ---
 
-## 인터페이스 구성
-
+## 시연 영상
+https://drive.google.com/file/d/1u1lNWz2awQUvta8nb6TkfOj2KphpeIjG/view?usp=drive_link
 
 
